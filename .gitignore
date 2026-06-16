@@ -1,0 +1,35 @@
+# Public repo allowlist: ignore everything by default, then permit only the
+# files meant to be published (non test source code and the presentations).
+
+# Ignore everything at the root.
+/*
+
+# Permit these root entries.
+!/.gitignore
+!/README.md
+!/meetings/
+
+# Inside meetings/: ignore all, then reopen each meeting directory.
+/meetings/*
+!/meetings/*/
+
+# Inside each meeting: ignore all, then reopen sim/ and presentation/.
+/meetings/*/*
+!/meetings/*/sim/
+!/meetings/*/presentation/
+
+# Inside sim/: ignore all, then permit the package marker and the boids package.
+/meetings/*/sim/*
+!/meetings/*/sim/__init__.py
+!/meetings/*/sim/boids/
+
+# Inside boids/: ignore all, then permit only Python files.
+/meetings/*/sim/boids/*
+!/meetings/*/sim/boids/*.py
+
+# presentation/: permit all of its files.
+!/meetings/*/presentation/*
+
+# Never publish Python caches.
+__pycache__/
+*.pyc
