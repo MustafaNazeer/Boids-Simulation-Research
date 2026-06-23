@@ -3,11 +3,19 @@ from sim.boids import rules, predator as predator_mod
 
 
 def default_params():
-    """Starting weights and radii. Expect to tune these for coherent flocking."""
+    """Tuned weights, radii, and speed limits.
+
+    Separation, alignment, and cohesion each have their own radius so the
+    recorder can log an independent neighbor adjacency list per behavior
+    (matching Angel Solis' reference schema).
+    """
     return {
-        "perception_radius": 16.0,
         "separation_radius": 7.0,
-        "max_speed": 3.0,
+        "alignment_radius": 16.0,
+        "cohesion_radius": 16.0,
+        "max_speed": 5.0,
+        "min_speed": 1.5,
+        "preplanned_speed": 5.0,
         "obstacle_avoid_range": 4.0,
         "fear_radius": 15.0,
         "weights": {
@@ -44,8 +52,8 @@ class World:
         w = prm["weights"]
         accels = [
             rules.separation(p, prm["separation_radius"]),
-            rules.alignment(p, v, prm["perception_radius"]),
-            rules.cohesion(p, prm["perception_radius"]),
+            rules.alignment(p, v, prm["alignment_radius"]),
+            rules.cohesion(p, prm["cohesion_radius"]),
         ]
         weights = [w["separation"], w["alignment"], w["cohesion"]]
         if self.obstacles is not None:
