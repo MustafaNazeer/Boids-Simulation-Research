@@ -98,3 +98,16 @@ def clamp_speed(velocities, max_speed):
     too_fast = speeds > max_speed
     out[too_fast] = out[too_fast] / speeds[too_fast, None] * max_speed
     return out
+
+
+def neighbor_id_lists(positions, radius, include_self=False):
+    """For each agent, the sorted list of neighbor indices within radius.
+
+    Excludes the agent itself unless include_self is True. Reuses the same
+    KD tree neighbor query as the flocking rules.
+    """
+    out = []
+    for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
+        ids = sorted(j for j in nbrs if include_self or j != i)
+        out.append(ids)
+    return out
