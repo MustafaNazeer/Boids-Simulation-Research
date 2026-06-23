@@ -111,3 +111,21 @@ def neighbor_id_lists(positions, radius, include_self=False):
         ids = sorted(j for j in nbrs if include_self or j != i)
         out.append(ids)
     return out
+
+
+def reflect_bounds(positions, velocities, size):
+    """Bounce agents off the walls of a [0, size] box instead of wrapping.
+
+    Any coordinate outside the box is reflected back in, and the velocity
+    component that crossed the wall is flipped to point inward. Keeping
+    trajectories continuous (no wrap jump) matters for clean trajectory data.
+    """
+    pos = positions.copy()
+    vel = velocities.copy()
+    low = pos < 0.0
+    pos[low] = -pos[low]
+    vel[low] = np.abs(vel[low])
+    high = pos > size
+    pos[high] = 2.0 * size - pos[high]
+    vel[high] = -np.abs(vel[high])
+    return pos, vel
