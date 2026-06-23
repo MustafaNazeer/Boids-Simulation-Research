@@ -129,3 +129,16 @@ def reflect_bounds(positions, velocities, size):
     pos[high] = 2.0 * size - pos[high]
     vel[high] = -np.abs(vel[high])
     return pos, vel
+
+
+def enforce_min_speed(velocities, min_speed):
+    """Boost any moving velocity below min_speed up to min_speed.
+
+    Agents exactly at rest stay at rest (there is no direction to boost).
+    Prevents agents stalling to near zero, which keeps trajectory data clean.
+    """
+    out = velocities.copy()
+    speeds = np.linalg.norm(out, axis=1)
+    too_slow = (speeds < min_speed) & (speeds > 0)
+    out[too_slow] = out[too_slow] / speeds[too_slow, None] * min_speed
+    return out
