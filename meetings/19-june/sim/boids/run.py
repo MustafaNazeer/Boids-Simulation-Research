@@ -79,6 +79,20 @@ def build_preplanned_debug_world(world_size, frames):
                  preplanned=agents, preplanned_mask=mask)
 
 
+def save_preplanned_path_plot(agents, world_size, out_path):
+    """Plot the full pre-planned paths (figure 8 and line shapes) to a PNG."""
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_xlim(0, world_size)
+    ax.set_ylim(0, world_size)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for path in agents.paths:
+        ax.plot(path[:, 0], path[:, 1], color="goldenrod", linewidth=1.5, alpha=0.9)
+    fig.savefig(out_path, dpi=120, bbox_inches="tight")
+    plt.close(fig)
+
+
 def record_metrics(world, frames, dt, cluster_threshold=5.0):
     pol, nn, clusters = [], [], []
     for _ in range(frames):
@@ -143,10 +157,9 @@ def main():
     debug_anim = build_preplanned_debug_world(world_size=60.0, frames=240)
     render.save_animation(debug_anim, frames=240, dt=0.2,
                           out_path=os.path.join(OUT, "preplanned_debug.gif"))
-    debug_snap = build_preplanned_debug_world(world_size=60.0, frames=240)
-    for _ in range(120):
-        debug_snap.step(0.2)
-    render.save_snapshot(debug_snap, os.path.join(OUT, "snapshot_preplanned.png"))
+    debug_for_plot = build_preplanned_debug_world(world_size=60.0, frames=240)
+    save_preplanned_path_plot(debug_for_plot.preplanned, 60.0,
+                              os.path.join(OUT, "snapshot_preplanned.png"))
 
     print("Wrote deliverables to", OUT)
 
