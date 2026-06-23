@@ -3,6 +3,7 @@ matplotlib.use("Agg")  # headless, no display required
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.patches import Circle
+import numpy as np
 
 
 def _draw_frame(ax, world):
@@ -16,8 +17,17 @@ def _draw_frame(ax, world):
         centers, radii = world.obstacles
         for c, r in zip(centers, radii):
             ax.add_patch(Circle(c, r, color="0.6", zorder=1))
-    ax.scatter(world.positions[:, 0], world.positions[:, 1],
-               s=7, c="steelblue", alpha=0.85, zorder=2)
+    mask = getattr(world, "preplanned_mask", None)
+    if mask is not None:
+        mask = np.asarray(mask, dtype=bool)
+        normal = ~mask
+        ax.scatter(world.positions[normal, 0], world.positions[normal, 1],
+                   s=7, c="steelblue", alpha=0.85, zorder=2)
+        ax.scatter(world.positions[mask, 0], world.positions[mask, 1],
+                   s=22, c="gold", alpha=0.95, zorder=3)
+    else:
+        ax.scatter(world.positions[:, 0], world.positions[:, 1],
+                   s=7, c="steelblue", alpha=0.85, zorder=2)
     if world.predator is not None:
         ax.scatter([world.predator["pos"][0]], [world.predator["pos"][1]],
                    s=60, c="crimson", marker="*", zorder=3)
