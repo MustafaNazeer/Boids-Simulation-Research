@@ -16,30 +16,46 @@ meetings/<date>/sim/           the simulation source (boids rules, predator,
 meetings/<date>/presentation/  the progress slides and the deck generator
 ```
 
-## Running the live demo
+## Instructions
 
-From a meeting folder (for example meetings/9-june):
+Run every command from inside the meeting folder you want, so the `sim` package
+resolves. Each meeting is self contained.
 
-```
-python3 -m sim.boids.live
-```
+### June 9
 
-A window opens and the flock animates in real time, steering around obstacles
-and scattering when a predator approaches. See
-`presentation/run-live-demo.md` for details.
-
-## Generating the saved artifacts
+From `meetings/9-june`:
 
 ```
-python3 -m sim.boids.run
+python3 -m sim.boids.live    # live animated window: flock, obstacles, predator
+python3 -m sim.boids.run     # writes the animation, metric plots, and snapshots to deliverables/
 ```
 
-This writes the animation, metric plots, and snapshots used in the slides.
+### June 19
+
+From `meetings/19-june`:
+
+```
+python3 -m sim.boids.live    # live animated window: flock, obstacles, predator
+python3 -m sim.boids.run     # writes the June 9 artifacts plus the trajectory data
+```
+
+In June 19, `python3 -m sim.boids.run` additionally writes `trajectory.csv`, a
+standalone `preplanned_debug.csv`, `preplanned_debug.gif`, and
+`snapshot_preplanned.png` (the preplanned figure 8 and line path shapes) into
+`deliverables/`.
+
+Build the progress deck from `meetings/19-june/presentation`:
+
+```
+python3 build_deck.py        # writes progress-deck.pptx
+```
+
+See `presentation/run-live-demo.md` inside a meeting folder for live demo notes.
 
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
-window).
+window). Building the slide deck also needs python-pptx.
 
 ## Note
 
