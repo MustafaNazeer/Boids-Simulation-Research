@@ -42,17 +42,7 @@ def straight_line(steps, orientation, amplitude, center):
     t = np.linspace(0.0, 2.0 * np.pi, steps)
     m = amplitude * np.sin(t)
     zero = np.zeros_like(m)
-    if orientation == "x":
-        return _orient(m, zero, "x", center)
-    if orientation == "y":
-        return _orient(m, zero, "y", center)
-    if orientation == "xy_pos":
-        x, y = m / np.sqrt(2.0), m / np.sqrt(2.0)
-    elif orientation == "xy_neg":
-        x, y = m / np.sqrt(2.0), -m / np.sqrt(2.0)
-    else:
-        raise ValueError("unknown orientation: %r" % (orientation,))
-    return np.column_stack([x, y]) + np.asarray(center, dtype=float)
+    return _orient(m, zero, orientation, center)
 
 
 FACTORIES = {"figure8": figure_eight, "line": straight_line}
