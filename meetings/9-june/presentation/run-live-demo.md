@@ -4,7 +4,7 @@
 - Go to the simulation folder & Start the live demo:
 
 ```
-cd ~/career/work/research/dr-patino/meetings/june-9 && python3 -m sim.boids.live
+cd ~/career/work/research/dr-patino/meetings/9-june && python3 -m sim.boids.live
 ```
 
 A window opens and the flock animates in real time. The title bar shows the
@@ -37,5 +37,5 @@ Then run step 2 again. If there is no display at all (for example a remote
 terminal with no screen), use the saved animation instead:
 
 ```
-xdg-open ~/career/work/research/dr-patino/meetings/june-9/deliverables/flock_escape.gif
+xdg-open ~/career/work/research/dr-patino/meetings/9-june/deliverables/flock_escape.gif
 ```

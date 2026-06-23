@@ -18,7 +18,7 @@ meetings/<date>/presentation/  the progress slides and the deck generator
 
 ## Running the live demo
 
-From a meeting folder (for example meetings/june-9):
+From a meeting folder (for example meetings/9-june):
 
 ```
 python3 -m sim.boids.live
