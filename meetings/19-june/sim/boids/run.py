@@ -10,7 +10,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from sim.boids.world import World, default_params
-from sim.boids import metrics, render
+from sim.boids import metrics, render, preplanned as preplanned_mod
+from sim.boids.recorder import TrajectoryRecorder
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # run.py lives in sim/boids/, so deliverables/ is two levels up (meetings/june-9/).
@@ -25,6 +26,57 @@ def build_world(seed=7, n_boids=120, world_size=60.0, with_predator=True):
     predator_state = {"pos": np.array([55.0, 55.0])} if with_predator else None
     return World(positions, velocities, default_params(), world_size,
                  obstacles=obstacles, predator_state=predator_state)
+
+
+def build_flock_with_leaders(seed, n_boids, world_size, n_leaders, frames):
+    """A flock with n_leaders pre-planned leaders, no predator, for clean data.
+
+    Leader positions are initialized to their path start so the first recorded
+    frame already sits on the path.
+    """
+    rng = np.random.default_rng(seed)
+    positions = rng.uniform(0, world_size, size=(n_boids, 2))
+    velocities = rng.uniform(-1, 1, size=(n_boids, 2))
+    params = default_params()
+    center = np.array([world_size / 2.0, world_size / 2.0])
+    amplitude = (world_size / 2.0) * 0.8
+
+    mask = np.zeros(n_boids, dtype=bool)
+    agents = None
+    if n_leaders > 0:
+        leader_ids = np.sort(rng.choice(n_boids, size=n_leaders, replace=False))
+        mask[leader_ids] = True
+        plans = preplanned_mod.PLAN_CATALOG[:n_leaders]
+        agents = preplanned_mod.PreplannedAgents(
+            plans, frames, amplitude, center, params["preplanned_speed"])
+        pp_pos, pp_vel = agents.state_at(0)
+        positions[leader_ids] = pp_pos
+        velocities[leader_ids] = pp_vel
+    return World(positions, velocities, params, world_size,
+                 preplanned=agents, preplanned_mask=mask)
+
+
+def record_trajectory(world, frames, dt, out_path):
+    """Step the world, recording every frame, then write the CSV."""
+    recorder = TrajectoryRecorder(dt)
+    for _ in range(frames):
+        recorder.record(world.step_index, world)
+        world.step(dt)
+    recorder.to_csv(out_path)
+
+
+def build_preplanned_debug_world(world_size, frames):
+    """All eight pre-planned plans, every agent pre-planned, for verification."""
+    params = default_params()
+    center = np.array([world_size / 2.0, world_size / 2.0])
+    amplitude = (world_size / 2.0) * 0.8
+    agents = preplanned_mod.PreplannedAgents(
+        preplanned_mod.PLAN_CATALOG, frames, amplitude, center,
+        params["preplanned_speed"])
+    pos0, vel0 = agents.state_at(0)
+    mask = np.ones(agents.count, dtype=bool)
+    return World(pos0.copy(), vel0.copy(), params, world_size,
+                 preplanned=agents, preplanned_mask=mask)
 
 
 def record_metrics(world, frames, dt, cluster_threshold=5.0):
@@ -77,6 +129,24 @@ def main():
     for _ in range(120):
         world.step(0.2)
     render.save_snapshot(world, os.path.join(OUT, "snapshot_late.png"))
+
+    # 4) Trajectory CSV: clean flock with two pre-planned leaders, no predator
+    flock = build_flock_with_leaders(seed=7, n_boids=120, world_size=60.0,
+                                     n_leaders=2, frames=300)
+    record_trajectory(flock, frames=300, dt=0.2,
+                      out_path=os.path.join(OUT, "trajectory.csv"))
+
+    # 5) Pre-planned debug scenario: known paths, CSV plus a gif and a snapshot
+    debug = build_preplanned_debug_world(world_size=60.0, frames=240)
+    record_trajectory(debug, frames=240, dt=0.2,
+                      out_path=os.path.join(OUT, "preplanned_debug.csv"))
+    debug_anim = build_preplanned_debug_world(world_size=60.0, frames=240)
+    render.save_animation(debug_anim, frames=240, dt=0.2,
+                          out_path=os.path.join(OUT, "preplanned_debug.gif"))
+    debug_snap = build_preplanned_debug_world(world_size=60.0, frames=240)
+    for _ in range(120):
+        debug_snap.step(0.2)
+    render.save_snapshot(debug_snap, os.path.join(OUT, "snapshot_preplanned.png"))
 
     print("Wrote deliverables to", OUT)
 
