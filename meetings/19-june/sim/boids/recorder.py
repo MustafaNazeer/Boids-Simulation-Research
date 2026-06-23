@@ -1,12 +1,3 @@
-"""Trajectory recorder: logs one CSV row per flock agent per step in Angel
-Solis' schema, so this pure Python data drops into the same PIGNN pipeline.
-
-Schema: step, boid_id, x, y, z, vel_x, vel_y, vel_z, pre_planned,
-separation, cohesion, alignment. The last three are per behavior neighbor id
-lists ("-" delimited), the time varying interaction graph the GNN learns from.
-The predator is not part of the flock position array, so it is naturally
-excluded.
-"""
 import csv
 import numpy as np
 from sim.boids import rules
@@ -14,11 +5,7 @@ from sim.boids import rules
 HEADER = ["step", "boid_id", "x", "y", "z", "vel_x", "vel_y", "vel_z",
           "pre_planned", "separation", "cohesion", "alignment"]
 
-
 class TrajectoryRecorder:
-    """Collects rows over a run and writes them as one CSV. Reads the world
-    only; it never steps or mutates it, so logging cannot change the dynamics.
-    """
 
     def __init__(self, dt, z_height=5.0, include_self=False):
         self.dt = float(dt)

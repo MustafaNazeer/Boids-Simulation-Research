@@ -1,8 +1,3 @@
-"""Pre-planned agents: motion is a known function of the step index, not of
-forces. Used standalone to verify the trajectory recorder, and dropped into the
-flock as leaders the normal boids follow. Path math mirrors Angel Solis'
-reference (github.com/asolis345/IsaacSimWBoids).
-"""
 import numpy as np
 
 ORIENTATIONS = ("x", "y", "xy_pos", "xy_neg")
@@ -11,7 +6,6 @@ PLAN_CATALOG = [
     ("figure8", "x"), ("figure8", "y"), ("figure8", "xy_pos"), ("figure8", "xy_neg"),
     ("line", "x"), ("line", "y"), ("line", "xy_pos"), ("line", "xy_neg"),
 ]
-
 
 def _orient(fx, fy, orientation, center):
     if orientation == "x":
@@ -28,38 +22,26 @@ def _orient(fx, fy, orientation, center):
         raise ValueError("unknown orientation: %r" % (orientation,))
     return np.column_stack([x, y]) + np.asarray(center, dtype=float)
 
-
 def figure_eight(steps, orientation, amplitude, center):
-    """Lissajous figure 8 path as a (steps, 2) array of positions."""
     t = np.linspace(0.0, 2.0 * np.pi, steps)
     fx = amplitude * np.sin(t)
     fy = amplitude * 0.5 * np.sin(t) * np.cos(t)
     return _orient(fx, fy, orientation, center)
 
-
 def straight_line(steps, orientation, amplitude, center):
-    """Back and forth straight line path as a (steps, 2) array of positions."""
     t = np.linspace(0.0, 2.0 * np.pi, steps)
     m = amplitude * np.sin(t)
     zero = np.zeros_like(m)
     return _orient(m, zero, orientation, center)
 
-
 FACTORIES = {"figure8": figure_eight, "line": straight_line}
 
-
 class PreplannedAgents:
-    """Agents that follow precomputed paths at a constant reported speed.
-
-    plans: list of (kind, orientation) with kind in {"figure8", "line"}.
-    Position comes straight from the path array; velocity is the step to step
-    path direction scaled to preplanned_speed (as in the reference).
-    """
 
     def __init__(self, plans, steps, amplitude, center, preplanned_speed):
         paths = [FACTORIES[kind](steps, orient, amplitude, center)
                  for kind, orient in plans]
-        self.paths = np.stack(paths)  # (M, steps, 2)
+        self.paths = np.stack(paths)
         self.steps = int(steps)
         self.preplanned_speed = float(preplanned_speed)
 

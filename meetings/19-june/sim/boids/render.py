@@ -1,10 +1,9 @@
 import matplotlib
-matplotlib.use("Agg")  # headless, no display required
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.patches import Circle
 import numpy as np
-
 
 def _draw_frame(ax, world):
     ax.clear()
@@ -32,9 +31,7 @@ def _draw_frame(ax, world):
         ax.scatter([world.predator["pos"][0]], [world.predator["pos"][1]],
                    s=60, c="crimson", marker="*", zorder=3)
 
-
 def save_animation(world, frames, dt, out_path, fps=20):
-    """Step the world `frames` times, writing an animated gif to out_path."""
     fig, ax = plt.subplots(figsize=(6, 6))
 
     def update(_):
@@ -45,9 +42,7 @@ def save_animation(world, frames, dt, out_path, fps=20):
     anim.save(out_path, writer=PillowWriter(fps=fps))
     plt.close(fig)
 
-
 def save_snapshot(world, out_path):
-    """Save a single PNG of the current world state."""
     fig, ax = plt.subplots(figsize=(6, 6))
     _draw_frame(ax, world)
     fig.savefig(out_path, dpi=120, bbox_inches="tight")

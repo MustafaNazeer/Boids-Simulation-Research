@@ -1,19 +1,9 @@
-"""Build the mentor progress deck (PowerPoint) from the simulation figures.
-
-Usage: python3 build_deck.py   (run from the presentation folder)
-Produces progress-deck.pptx in the same folder; reads figures from the sibling
-deliverables folder.
-
-Dark theme with a red accent. One title slide plus five content slides.
-"""
 import os
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# Figures live in the sibling deliverables folder; the pptx is written next to
-# this script (the presentation folder).
 FIG = os.path.normpath(os.path.join(HERE, "..", "deliverables"))
 
 DARK = RGBColor(0x1E, 0x1E, 0x26)
@@ -26,17 +16,14 @@ prs.slide_width = Inches(13.333)
 prs.slide_height = Inches(7.5)
 BLANK = prs.slide_layouts[6]
 
-
 def add_bg(slide):
     slide.background.fill.solid()
     slide.background.fill.fore_color.rgb = DARK
-
 
 def box(slide, left, top, width, height):
     tb = slide.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
     tb.text_frame.word_wrap = True
     return tb.text_frame
-
 
 def line(tf, text, size, color, bold=False, first=False, space=8):
     p = tf.paragraphs[0] if first else tf.add_paragraph()
@@ -49,28 +36,22 @@ def line(tf, text, size, color, bold=False, first=False, space=8):
     r.font.name = "Calibri"
     return p
 
-
 def title_of(slide, text):
     tf = box(slide, 0.7, 0.45, 12.0, 1.1)
     line(tf, text, 30, RED, bold=True, first=True)
-
 
 def bullets_of(slide, items, left=0.75, top=1.7, width=12.0, size=19):
     tf = box(slide, left, top, width, 5.3)
     for i, b in enumerate(items):
         line(tf, "•  " + b, size, LIGHT, first=(i == 0), space=12)
 
-
 def caption(slide, text, left, top, width):
     tf = box(slide, left, top, width, 0.4)
     line(tf, text, 12, MUTED, first=True)
 
-
 def img(slide, name, left, top, width):
     slide.shapes.add_picture(os.path.join(FIG, name), Inches(left), Inches(top), width=Inches(width))
 
-
-# Slide 1: title
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 tf = box(s, 0.9, 2.0, 11.5, 2.6)
@@ -85,7 +66,6 @@ tf = box(s, 0.9, 6.95, 11.5, 0.4)
 line(tf, "Figures and code produced with AI assistance, disclosed per course policy.",
      11, MUTED, first=True)
 
-# Slide 2: this week's goal
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 title_of(s, "From a visual flock to usable data")
@@ -100,7 +80,6 @@ bullets_of(s, [
     "interchangeable.",
 ])
 
-# Slide 3: the data pipeline
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 title_of(s, "What the recorder captures")
@@ -115,7 +94,6 @@ bullets_of(s, [
     "the same model.",
 ])
 
-# Slide 4: pre-planned debug agents
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 title_of(s, "Known paths to trust the data")
@@ -129,7 +107,6 @@ bullets_of(s, [
 img(s, "snapshot_preplanned.png", 4.6, 3.2, 4.1)
 caption(s, "Pre-planned agents tracing known figure 8 and line paths", 4.6, 7.05, 4.5)
 
-# Slide 5: results and findings (no graphs, qualitative)
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 title_of(s, "Results and findings")
@@ -145,7 +122,6 @@ bullets_of(s, [
     "We now have the raw material a Graph Neural Network would consume.",
 ])
 
-# Slide 6: next steps
 s = prs.slides.add_slide(BLANK)
 add_bg(s)
 title_of(s, "Next steps")

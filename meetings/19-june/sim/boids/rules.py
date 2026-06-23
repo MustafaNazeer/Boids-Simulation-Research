@@ -1,22 +1,13 @@
 import numpy as np
 from scipy.spatial import cKDTree
 
-
 def _neighbor_lists(positions, radius):
-    """Return, for each point, the list of indices within radius (includes self)."""
     if positions.shape[0] == 0:
         return []
     tree = cKDTree(positions)
     return tree.query_ball_tree(tree, radius)
 
-
 def separation(positions, radius):
-    """Steer away from neighbors within radius, weighted by inverse distance.
-
-    Closer neighbors push harder (the steer contribution scales as 1/distance),
-    which keeps the flock spaced out instead of collapsing to a point.
-    Returns (N, D) accelerations.
-    """
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -34,9 +25,7 @@ def separation(positions, radius):
             accel[i] = steer / count
     return accel
 
-
 def alignment(positions, velocities, radius):
-    """Steer toward the average velocity of neighbors. Returns (N, D)."""
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -46,9 +35,7 @@ def alignment(positions, velocities, radius):
             accel[i] = avg_vel - velocities[i]
     return accel
 
-
 def cohesion(positions, radius):
-    """Steer toward the centroid of neighbors. Returns (N, D)."""
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -58,12 +45,7 @@ def cohesion(positions, radius):
             accel[i] = centroid - positions[i]
     return accel
 
-
 def obstacle_avoidance(positions, centers, radii, avoid_range):
-    """Push away from circular obstacles, stronger the closer the boid is.
-
-    centers: (M, D), radii: (M,), avoid_range: float buffer beyond each radius.
-    """
     if avoid_range <= 0:
         raise ValueError("avoid_range must be positive")
     n, d = positions.shape
@@ -79,9 +61,7 @@ def obstacle_avoidance(positions, centers, radii, avoid_range):
         accel[mask] += (offset[mask] / dist[mask, None]) * strength[:, None]
     return accel
 
-
 def combine(accels, weights):
-    """Weighted sum of a list of (N, D) acceleration arrays."""
     if not accels:
         raise ValueError("accels must be non-empty")
     total = None
@@ -90,36 +70,21 @@ def combine(accels, weights):
         total = contribution if total is None else total + contribution
     return total
 
-
 def clamp_speed(velocities, max_speed):
-    """Rescale any velocity whose magnitude exceeds max_speed."""
     out = velocities.copy()
     speeds = np.linalg.norm(out, axis=1)
     too_fast = speeds > max_speed
     out[too_fast] = out[too_fast] / speeds[too_fast, None] * max_speed
     return out
 
-
 def neighbor_id_lists(positions, radius, include_self=False):
-    """For each agent, the sorted list of neighbor indices within radius.
-
-    Excludes the agent itself unless include_self is True. Reuses the same
-    KD tree neighbor query as the flocking rules.
-    """
     out = []
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
         ids = sorted(j for j in nbrs if include_self or j != i)
         out.append(ids)
     return out
 
-
 def reflect_bounds(positions, velocities, size):
-    """Bounce agents off the walls of a [0, size] box instead of wrapping.
-
-    Any coordinate outside the box is reflected back in, and the velocity
-    component that crossed the wall is flipped to point inward. Keeping
-    trajectories continuous (no wrap jump) matters for clean trajectory data.
-    """
     pos = positions.copy()
     vel = velocities.copy()
     low = pos < 0.0
@@ -130,13 +95,7 @@ def reflect_bounds(positions, velocities, size):
     vel[high] = -np.abs(vel[high])
     return pos, vel
 
-
 def enforce_min_speed(velocities, min_speed):
-    """Boost any moving velocity below min_speed up to min_speed.
-
-    Agents exactly at rest stay at rest (there is no direction to boost).
-    Prevents agents stalling to near zero, which keeps trajectory data clean.
-    """
     out = velocities.copy()
     speeds = np.linalg.norm(out, axis=1)
     too_slow = (speeds < min_speed) & (speeds > 0)

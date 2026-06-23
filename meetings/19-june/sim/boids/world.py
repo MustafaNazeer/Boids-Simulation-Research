@@ -1,14 +1,7 @@
 import numpy as np
 from sim.boids import rules, predator as predator_mod
 
-
 def default_params():
-    """Tuned weights, radii, and speed limits.
-
-    Separation, alignment, and cohesion each have their own radius so the
-    recorder can log an independent neighbor adjacency list per behavior
-    (matching Angel Solis' reference schema).
-    """
     return {
         "separation_radius": 7.0,
         "alignment_radius": 16.0,
@@ -27,14 +20,7 @@ def default_params():
         },
     }
 
-
 class World:
-    """Holds boid state and advances it by one step at a time.
-
-    obstacles: optional (centers (M,2) array, radii (M,) array) tuple.
-    predator_state: optional dict with key "pos" (2,) array; when present the
-        predator pursues the flock and boids flee from it.
-    """
 
     def __init__(self, positions, velocities, params, world_size,
                  obstacles=None, predator_state=None,
@@ -43,11 +29,11 @@ class World:
         self.velocities = np.asarray(velocities, dtype=float).copy()
         self.params = params
         self.world_size = float(world_size)
-        self.obstacles = obstacles  # (centers, radii) or None
-        self.predator = predator_state  # {"pos": (2,)} or None
-        self.preplanned = preplanned  # PreplannedAgents or None
-        self.preplanned_mask = preplanned_mask  # (N,) bool or None
-        self.bounds_mode = bounds_mode  # "reflect" or "wrap"
+        self.obstacles = obstacles
+        self.predator = predator_state
+        self.preplanned = preplanned
+        self.preplanned_mask = preplanned_mask
+        self.bounds_mode = bounds_mode
         self.step_index = 0
         self.time = 0.0
 
