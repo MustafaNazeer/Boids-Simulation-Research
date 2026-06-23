@@ -1,7 +1,7 @@
 """Run the boids simulation and write deliverables (animation, plots, snapshots).
 
-Usage: python3 -m sim.boids.run  (run from the meetings/june-9 folder)
-Outputs land in meetings/june-9/deliverables/.
+Usage: python3 -m sim.boids.run  (run from the meetings/19-june folder)
+Outputs land in meetings/19-june/deliverables/.
 """
 import os
 import numpy as np
@@ -14,7 +14,7 @@ from sim.boids import metrics, render, preplanned as preplanned_mod
 from sim.boids.recorder import TrajectoryRecorder
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# run.py lives in sim/boids/, so deliverables/ is two levels up (meetings/june-9/).
+# run.py lives in sim/boids/, so deliverables/ is two levels up (meetings/19-june/).
 OUT = os.path.normpath(os.path.join(HERE, "..", "..", "deliverables"))
 
 
