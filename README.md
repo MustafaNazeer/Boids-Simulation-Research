@@ -5,16 +5,20 @@ emergent behavior in dynamic multi agent systems. The longer term goal is to
 learn these local interaction rules with a Graph Neural Network.
 
 Work is organized by research meeting date. Each meeting folder holds that
-week's simulation source and a short slide deck describing what the deliverables
-do.
+week's simulation source and a short slide deck describing what the
+deliverables do.
 
 ## Layout
 
 ```
 meetings/<date>/sim/           the simulation source (boids rules, predator,
                                metrics, world, rendering, and runners)
-meetings/<date>/presentation/  the progress slides and the deck generator
+meetings/<date>/presentation/  the progress deck (progress-deck.pptx)
 ```
+
+Generated artifacts (animations, metric plots, snapshots, and datasets) are
+written into a local `deliverables/` folder when you run the code and are not
+checked into the repository.
 
 ## Instructions
 
@@ -44,18 +48,40 @@ standalone `preplanned_debug.csv`, `preplanned_debug.gif`, and
 `snapshot_preplanned.png` (the preplanned figure 8 and line path shapes) into
 `deliverables/`.
 
-Build the progress deck from `meetings/19-june/presentation`:
+### June 26
+
+June 26 covered the move to the UTA high performance computing cluster: getting
+GPU access through Dr. Patino and learning the Slurm workflow that shares the
+GPUs fairly. There is no new simulation code for this week. The deliverable is
+the progress deck in `meetings/26-june/presentation/`.
+
+### June 30
+
+June 30 delivered a batch data generator that turns the simulation into a
+parameter diverse dataset for training the Graph Neural Network. It reruns the
+simulation many times, randomizing the physics parameters within set ranges
+from a single seed, and saves every run in two forms plus a manifest.
+
+From `meetings/30-june`:
 
 ```
-python3 build_deck.py        # writes progress-deck.pptx
+python3 -m sim.boids.collect --runs 8 --frames 300   # writes the dataset to deliverables/dataset/
+python3 -m sim.boids.live                            # live animated window
+python3 -m sim.boids.run                             # single run: animation, plots, trajectory
 ```
 
-See `presentation/run-live-demo.md` inside a meeting folder for live demo notes.
+`collect.py` accepts `--runs`, `--frames`, `--dt`, `--seed`, `--world-size`,
+and `--out`. Each run writes a readable `run_XXXX.csv` (the per agent
+trajectory) and a compact compressed `run_XXXX.npz` (positions, velocities, the
+preplanned mask, and the run parameters) into `deliverables/dataset/`, together
+with a `manifest.csv` that ties every run back to the exact parameters that
+produced it. The whole dataset is reproducible from the single `--seed` value
+under the same run settings.
 
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
-window). Building the slide deck also needs python-pptx.
+window).
 
 ## Note
 

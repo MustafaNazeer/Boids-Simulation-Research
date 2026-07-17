@@ -27,8 +27,10 @@
 /meetings/*/sim/boids/*
 !/meetings/*/sim/boids/*.py
 
-# presentation/: permit all of its files.
-!/meetings/*/presentation/*
+# presentation/: permit only the compiled progress deck, nothing else
+# (no build_deck.py, no markdown draft, no run-live-demo notes).
+/meetings/*/presentation/*
+!/meetings/*/presentation/progress-deck.pptx
 
 # Never publish Python caches.
 __pycache__/
