@@ -47,7 +47,7 @@ def cohesion(positions, radius):
 
 def obstacle_avoidance(positions, centers, radii, avoid_range):
     if avoid_range <= 0:
-        raise ValueError("avoid_range must be positive")
+        raise ValueError('avoid_range must be positive')
     n, d = positions.shape
     accel = np.zeros((n, d))
     centers = np.asarray(centers, dtype=float).reshape(-1, d)
@@ -58,12 +58,12 @@ def obstacle_avoidance(positions, centers, radii, avoid_range):
         threshold = r + avoid_range
         mask = (dist < threshold) & (dist > 0)
         strength = (threshold - dist[mask]) / avoid_range
-        accel[mask] += (offset[mask] / dist[mask, None]) * strength[:, None]
+        accel[mask] += offset[mask] / dist[mask, None] * strength[:, None]
     return accel
 
 def combine(accels, weights):
     if not accels:
-        raise ValueError("accels must be non-empty")
+        raise ValueError('accels must be non-empty')
     total = None
     for a, w in zip(accels, weights):
         contribution = a * w
@@ -80,7 +80,7 @@ def clamp_speed(velocities, max_speed):
 def neighbor_id_lists(positions, radius, include_self=False):
     out = []
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
-        ids = sorted(j for j in nbrs if include_self or j != i)
+        ids = sorted((j for j in nbrs if include_self or j != i))
         out.append(ids)
     return out
 
@@ -93,7 +93,7 @@ def reflect_bounds(positions, velocities, size):
     high = pos > size
     pos[high] = 2.0 * size - pos[high]
     vel[high] = -np.abs(vel[high])
-    return pos, vel
+    return (pos, vel)
 
 def enforce_min_speed(velocities, min_speed):
     out = velocities.copy()

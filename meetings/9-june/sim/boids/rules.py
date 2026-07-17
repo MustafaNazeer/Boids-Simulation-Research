@@ -1,22 +1,13 @@
 import numpy as np
 from scipy.spatial import cKDTree
 
-
 def _neighbor_lists(positions, radius):
-    """Return, for each point, the list of indices within radius (includes self)."""
     if positions.shape[0] == 0:
         return []
     tree = cKDTree(positions)
     return tree.query_ball_tree(tree, radius)
 
-
 def separation(positions, radius):
-    """Steer away from neighbors within radius, weighted by inverse distance.
-
-    Closer neighbors push harder (the steer contribution scales as 1/distance),
-    which keeps the flock spaced out instead of collapsing to a point.
-    Returns (N, D) accelerations.
-    """
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -34,9 +25,7 @@ def separation(positions, radius):
             accel[i] = steer / count
     return accel
 
-
 def alignment(positions, velocities, radius):
-    """Steer toward the average velocity of neighbors. Returns (N, D)."""
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -46,9 +35,7 @@ def alignment(positions, velocities, radius):
             accel[i] = avg_vel - velocities[i]
     return accel
 
-
 def cohesion(positions, radius):
-    """Steer toward the centroid of neighbors. Returns (N, D)."""
     n, d = positions.shape
     accel = np.zeros((n, d))
     for i, nbrs in enumerate(_neighbor_lists(positions, radius)):
@@ -58,14 +45,9 @@ def cohesion(positions, radius):
             accel[i] = centroid - positions[i]
     return accel
 
-
 def obstacle_avoidance(positions, centers, radii, avoid_range):
-    """Push away from circular obstacles, stronger the closer the boid is.
-
-    centers: (M, D), radii: (M,), avoid_range: float buffer beyond each radius.
-    """
     if avoid_range <= 0:
-        raise ValueError("avoid_range must be positive")
+        raise ValueError('avoid_range must be positive')
     n, d = positions.shape
     accel = np.zeros((n, d))
     centers = np.asarray(centers, dtype=float).reshape(-1, d)
@@ -76,23 +58,19 @@ def obstacle_avoidance(positions, centers, radii, avoid_range):
         threshold = r + avoid_range
         mask = (dist < threshold) & (dist > 0)
         strength = (threshold - dist[mask]) / avoid_range
-        accel[mask] += (offset[mask] / dist[mask, None]) * strength[:, None]
+        accel[mask] += offset[mask] / dist[mask, None] * strength[:, None]
     return accel
 
-
 def combine(accels, weights):
-    """Weighted sum of a list of (N, D) acceleration arrays."""
     if not accels:
-        raise ValueError("accels must be non-empty")
+        raise ValueError('accels must be non-empty')
     total = None
     for a, w in zip(accels, weights):
         contribution = a * w
         total = contribution if total is None else total + contribution
     return total
 
-
 def clamp_speed(velocities, max_speed):
-    """Rescale any velocity whose magnitude exceeds max_speed."""
     out = velocities.copy()
     speeds = np.linalg.norm(out, axis=1)
     too_fast = speeds > max_speed

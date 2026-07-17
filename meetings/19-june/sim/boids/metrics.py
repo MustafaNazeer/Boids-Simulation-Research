@@ -23,7 +23,7 @@ def cluster_count(positions, threshold):
     if n == 0:
         return 0
     tree = cKDTree(positions)
-    pairs = tree.query_pairs(threshold, output_type="ndarray")
+    pairs = tree.query_pairs(threshold, output_type='ndarray')
     if len(pairs) == 0:
         return n
     data = np.ones(len(pairs))
