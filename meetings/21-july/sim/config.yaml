@@ -1,0 +1,79 @@
+# Boids simulation configuration.
+#
+#   python3 -m sim.boids.run
+#   python3 -m sim.boids.live
+#   python3 -m sim.boids.collect
+#
+# Each rule below has its own enabled flag and its own radius. Setting
+# enabled to false removes the rule from the simulation entirelyl. It is not
+# computed at all.
+
+world:
+  size: 60.0
+  bounds: reflect       # reflect (agents bounce off the edge) or wrap
+  n_boids: 120
+  seed: 11
+
+motion:
+  max_speed: 5.0
+  min_speed: 1.5
+  dt: 0.2
+  frames: 300
+
+rules:
+
+  # The three classic rules. Each has an independent radius, which
+  # is what lets a boid see its neighbors differently for each behavior
+  separation:
+    enabled: true
+    radius: 7.0
+    weight: 8.0
+
+  alignment:
+    enabled: true
+    radius: 16.0
+    weight: 1.6
+
+  cohesion:
+    enabled: true
+    radius: 16.0
+    weight: 0.5
+
+  # Steering around the circular obstacles placed in the world
+  obstacle_avoidance:
+    enabled: true
+    range: 4.0
+    weight: 2.5
+
+  # Fleeing the pursuing predator
+  predator_flee:
+    enabled: true
+    radius: 15.0
+    weight: 3.5
+
+  # A follower steers toward the nearest leader inside this
+  # radius. The radius is deliberately larger than the cohesion radius, so a
+  # leader pulls from further away than ordinary flocking reaches
+  leader_follow:
+    enabled: true
+    radius: 20.0
+    weight: 1.0
+
+  # Leader moves by a strength range (-0.15 - +0.15) for wandering behavior.
+  leader_wander:
+    enabled: true
+    strength: 0.15
+    weight: 2.0
+
+leaders:
+  count: 3
+
+# Agents welded to a precomputed path (figure 8 and straight lines), used to
+# check that the recorder logs what actually happened
+preplanned:
+  count: 0
+  speed: 5.0
+
+scenario:
+  predator: true
+  obstacles: true

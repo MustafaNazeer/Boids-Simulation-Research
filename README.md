@@ -78,10 +78,41 @@ with a `manifest.csv` that ties every run back to the exact parameters that
 produced it. The whole dataset is reproducible from the single `--seed` value
 under the same run settings.
 
+### July 21
+
+July 21 adds the Leader-Follower behavior and a configuration file.
+
+A configurable number of leaders wander on a drifting heading while every
+other boid steers toward its nearest leader within the follow radius. Leaders
+and followers alike still run separation, alignment, and cohesion. The
+recorder logs `is_leader` and `leader_id` alongside the three neighbor lists,
+so the follower to leader link is stored as a fourth graph.
+
+From `meetings/21-july`:
+
+```
+python3 -m sim.boids.live      # live animated window
+python3 -m sim.boids.run       # writes the animations, plots, snapshots, and trajectories
+python3 -m sim.boids.collect   # batch parameter sweep into deliverables/dataset/
+```
+
+All three entry points read `sim/config.yaml`, which holds every tunable value
+and gives each rule its own radius and its own `enabled` flag. Setting a rule
+to `enabled: false` removes it from the simulation entirely rather than
+weighting it to zero. Point any entry point at a different file with
+`--config <path>`:
+
+```
+python3 -m sim.boids.run --config my-experiment.yaml
+```
+
+A config that names an unknown key, an invalid bounds mode, or more leaders
+than boids is rejected at load time with a message naming the offending key.
+
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
-window).
+window). The July 21 configuration file also needs PyYAML.
 
 ## Note
 

@@ -18,9 +18,12 @@
 !/meetings/*/sim/
 !/meetings/*/presentation/
 
-# Inside sim/: ignore all, then permit the package marker and the boids package.
+# Inside sim/: ignore all, then permit the package marker, the configuration
+# file (added July 2026, the entry points read it at startup), and the boids
+# package.
 /meetings/*/sim/*
 !/meetings/*/sim/__init__.py
+!/meetings/*/sim/config.yaml
 !/meetings/*/sim/boids/
 
 # Inside boids/: ignore all, then permit only Python files.
