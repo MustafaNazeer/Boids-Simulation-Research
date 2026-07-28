@@ -9,31 +9,36 @@
 !/README.md
 !/meetings/
 
-# Inside meetings/: ignore all, then reopen each meeting directory.
+# Inside meetings/: ignore all, then reopen each month directory and its
+# placeholder (months are created ahead of their first meeting).
 /meetings/*
 !/meetings/*/
-
-# Inside each meeting: ignore all, then reopen sim/ and presentation/.
 /meetings/*/*
-!/meetings/*/sim/
-!/meetings/*/presentation/
+!/meetings/*/.gitkeep
+!/meetings/*/*/
+
+# Inside each meeting (meetings/<month>/<day>/): ignore all, then reopen
+# sim/ and presentation/.
+/meetings/*/*/*
+!/meetings/*/*/sim/
+!/meetings/*/*/presentation/
 
 # Inside sim/: ignore all, then permit the package marker, the configuration
 # file (added July 2026, the entry points read it at startup), and the boids
 # package.
-/meetings/*/sim/*
-!/meetings/*/sim/__init__.py
-!/meetings/*/sim/config.yaml
-!/meetings/*/sim/boids/
+/meetings/*/*/sim/*
+!/meetings/*/*/sim/__init__.py
+!/meetings/*/*/sim/config.yaml
+!/meetings/*/*/sim/boids/
 
 # Inside boids/: ignore all, then permit only Python files.
-/meetings/*/sim/boids/*
-!/meetings/*/sim/boids/*.py
+/meetings/*/*/sim/boids/*
+!/meetings/*/*/sim/boids/*.py
 
 # presentation/: permit only the compiled progress deck, nothing else
 # (no build_deck.py, no markdown draft, no run-live-demo notes).
-/meetings/*/presentation/*
-!/meetings/*/presentation/progress-deck.pptx
+/meetings/*/*/presentation/*
+!/meetings/*/*/presentation/progress-deck.pptx
 
 # Never publish Python caches.
 __pycache__/

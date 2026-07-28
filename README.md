@@ -11,9 +11,9 @@ deliverables do.
 ## Layout
 
 ```
-meetings/<date>/sim/           the simulation source (boids rules, predator,
+meetings/<month>/<day>/sim/               the simulation source (boids rules, predator,
                                metrics, world, rendering, and runners)
-meetings/<date>/presentation/  the progress deck (progress-deck.pptx)
+meetings/<month>/<day>/presentation/  the progress deck (progress-deck.pptx)
 ```
 
 Generated artifacts (animations, metric plots, snapshots, and datasets) are
@@ -27,7 +27,7 @@ resolves. Each meeting is self contained.
 
 ### June 9
 
-From `meetings/9-june`:
+From `meetings/june/09`:
 
 ```
 python3 -m sim.boids.live    # live animated window: flock, obstacles, predator
@@ -36,7 +36,7 @@ python3 -m sim.boids.run     # writes the animation, metric plots, and snapshots
 
 ### June 19
 
-From `meetings/19-june`:
+From `meetings/june/19`:
 
 ```
 python3 -m sim.boids.live    # live animated window: flock, obstacles, predator
@@ -53,7 +53,7 @@ standalone `preplanned_debug.csv`, `preplanned_debug.gif`, and
 June 26 covered the move to the UTA high performance computing cluster: getting
 GPU access through Dr. Patino and learning the Slurm workflow that shares the
 GPUs fairly. There is no new simulation code for this week. The deliverable is
-the progress deck in `meetings/26-june/presentation/`.
+the progress deck in `meetings/june/26/presentation/`.
 
 ### June 30
 
@@ -62,7 +62,7 @@ parameter diverse dataset for training the Graph Neural Network. It reruns the
 simulation many times, randomizing the physics parameters within set ranges
 from a single seed, and saves every run in two forms plus a manifest.
 
-From `meetings/30-june`:
+From `meetings/june/30`:
 
 ```
 python3 -m sim.boids.collect --runs 8 --frames 300   # writes the dataset to deliverables/dataset/
@@ -88,7 +88,7 @@ and followers alike still run separation, alignment, and cohesion. The
 recorder logs `is_leader` and `leader_id` alongside the three neighbor lists,
 so the follower to leader link is stored as a fourth graph.
 
-From `meetings/21-july`:
+From `meetings/july/21`:
 
 ```
 python3 -m sim.boids.live      # live animated window
