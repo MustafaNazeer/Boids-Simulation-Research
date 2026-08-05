@@ -72,8 +72,10 @@ rules:
     radius: 20.0
     weight: 1.0
 
+# Wander leaders. The shipped scenario is food foraging, so this is 0. Raise
+# it to add leaders that followers trail, which is the July 21 behavior
 leaders:
-  count: 3
+  count: 0
 
 # Agents welded to a precomputed path (figure 8 and straight lines), used to
 # check that the recorder logs what actually happened
@@ -93,6 +95,9 @@ food:
   eat_radius: 1.5
   respawn: true
 
+# The predator is off in the shipped scenario so the foraging behavior reads
+# clearly. Switch it back on for a predator escape run; the escape animation
+# that run.py writes uses its own scenario and is unaffected by this setting
 scenario:
-  predator: true
+  predator: false
   obstacles: true

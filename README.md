@@ -136,10 +136,19 @@ python3 -m sim.boids.run       # writes the animations, plots, snapshots, and tr
 python3 -m sim.boids.collect   # batch parameter sweep into deliverables/dataset/
 ```
 
-In `sim/config.yaml`, `food.count` defaults to 0, so foraging is off unless
-asked for and no existing configuration changes how its flock moves. The
-recorder gains the `food_id` column on every run regardless, and the renderer
-restyle applies to every rendered output.
+The shipped `sim/config.yaml` is the foraging scenario: three food sources
+and obstacles, with no leaders and no predator, so the plain commands show
+the new behavior without any extra arguments. Add leaders with
+`leaders.count`, bring back the predator with `scenario.predator`, or switch
+foraging off with `food.count: 0`. `sim/foraging.yaml` is the same scenario
+with the obstacles removed as well.
+
+Obstacles are enforced as a hard constraint rather than by steering alone.
+Steering forces grow with distance, so a strong enough pull toward food or
+toward the flock center could otherwise drag a boid straight through an
+obstacle; anything that ends a step inside one is now placed back on the
+surface and loses only the part of its velocity driving it deeper. Food is
+never placed inside an obstacle either.
 
 ## Dependencies
 

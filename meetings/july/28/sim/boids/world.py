@@ -141,8 +141,12 @@ class World:
         if self.bounds_mode == "none":
             center = self.positions.mean(axis=0)
             lo = center - self.world_size / 2.0
-            return lo + self.rng.uniform(0.0, self.world_size, size=2)
-        return self.rng.uniform(0.0, self.world_size, size=2)
+            def draw():
+                return lo + self.rng.uniform(0.0, self.world_size, size=2)
+        else:
+            def draw():
+                return self.rng.uniform(0.0, self.world_size, size=2)
+        return food_mod.sample_clear(draw, self.obstacles)
 
     def _eat_and_respawn(self):
         ids = self.food_ids
@@ -170,6 +174,10 @@ class World:
         moved = self.positions + self.velocities * dt
         self.positions, self.velocities = self._apply_bounds(
             moved, self.velocities)
+        if self.obstacles is not None:
+            centers, radii = self.obstacles
+            self.positions, self.velocities = rules.resolve_obstacle_overlap(
+                self.positions, self.velocities, centers, radii)
         self._reflect_headings(moved)
         if self.preplanned is not None:
             idx = np.where(self.preplanned_mask)[0]

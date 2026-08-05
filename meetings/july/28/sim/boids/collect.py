@@ -135,7 +135,10 @@ def build_world(cfg, run_seed, frames, world_size, base=None, bounds_mode="refle
     food_positions = None
     food_amounts = None
     if cfg["n_food"] > 0:
-        food_positions = rng.uniform(0, world_size, size=(cfg["n_food"], 2))
+        food_positions = np.array([
+            food_mod.sample_clear(
+                lambda: rng.uniform(0, world_size, size=2), obstacles)
+            for _ in range(cfg["n_food"])])
         food_amounts = np.full(cfg["n_food"], float(params["food_amount"]))
 
     return World(positions, velocities, params, world_size,

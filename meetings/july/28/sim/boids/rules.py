@@ -95,6 +95,39 @@ def reflect_bounds(positions, velocities, size):
     vel[high] = -np.abs(vel[high])
     return pos, vel
 
+def resolve_obstacle_overlap(positions, velocities, centers, radii):
+    # obstacle_avoidance is a steering force capped by its ramp, so a stronger
+    # pull (food, or the flock centroid) can drag a boid straight through an
+    # obstacle. This is the hard constraint that steering alone cannot give:
+    # anything that ends a step inside an obstacle is placed back on the
+    # surface and loses only the part of its velocity driving it deeper.
+    pos = np.asarray(positions, dtype=float).copy()
+    vel = np.asarray(velocities, dtype=float).copy()
+    if centers is None:
+        return pos, vel
+    d = pos.shape[1]
+    centers = np.asarray(centers, dtype=float).reshape(-1, d)
+    radii = np.asarray(radii, dtype=float).reshape(-1)
+    for c, r in zip(centers, radii):
+        offset = pos - c
+        dist = np.linalg.norm(offset, axis=1)
+        inside = dist < r
+        if not inside.any():
+            continue
+        normal = np.zeros_like(offset)
+        off_center = inside & (dist > 0.0)
+        normal[off_center] = offset[off_center] / dist[off_center, None]
+        # a boid exactly at the center has no outward direction of its own, so
+        # pick a fixed one; an arbitrary choice here would break reproducibility
+        dead_center = inside & (dist == 0.0)
+        if dead_center.any():
+            normal[dead_center, 0] = 1.0
+        rows = np.where(inside)[0]
+        pos[rows] = c + normal[rows] * r
+        inward = np.einsum("ij,ij->i", vel[rows], normal[rows])
+        vel[rows] -= np.minimum(inward, 0.0)[:, None] * normal[rows]
+    return pos, vel
+
 def enforce_min_speed(velocities, min_speed):
     out = velocities.copy()
     speeds = np.linalg.norm(out, axis=1)

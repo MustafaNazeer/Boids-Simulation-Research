@@ -3,6 +3,29 @@ from scipy.spatial import cKDTree
 
 NO_FOOD = -1
 
+# how many times a placement is redrawn before giving up; a world whose
+# obstacles cover almost everything must still finish rather than loop forever
+SPAWN_TRIES = 50
+
+def clear_of_obstacles(point, obstacles):
+    if obstacles is None:
+        return True
+    centers, radii = obstacles
+    point = np.asarray(point, dtype=float)
+    centers = np.asarray(centers, dtype=float).reshape(-1, point.shape[0])
+    radii = np.asarray(radii, dtype=float).reshape(-1)
+    return bool((np.linalg.norm(centers - point, axis=1) >= radii).all())
+
+def sample_clear(draw, obstacles):
+    # a source placed inside an obstacle is an attractor in the middle of a
+    # wall, which pulls the flock into something it cannot enter
+    point = draw()
+    for _ in range(SPAWN_TRIES):
+        if clear_of_obstacles(point, obstacles):
+            break
+        point = draw()
+    return point
+
 def seek(positions, food_positions, food_amounts, sensing_radius):
 
     positions = np.asarray(positions, dtype=float)

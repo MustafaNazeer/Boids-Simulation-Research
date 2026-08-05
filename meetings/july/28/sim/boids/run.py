@@ -1,4 +1,5 @@
 import os
+import copy
 import argparse
 import numpy as np
 import matplotlib
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from sim.boids.world import World, default_params
 from sim.boids import metrics, render, preplanned as preplanned_mod
+from sim.boids import food as food_mod
 from sim.boids import config as config_mod
 from sim.boids.recorder import TrajectoryRecorder
 
@@ -73,6 +75,15 @@ def build_foraging_world(seed=11, n_boids=120, world_size=60.0, n_food=3,
                  food_positions=food_positions, food_amounts=food_amounts,
                  seed=seed)
 
+def build_escape_world(cfg):
+    # the escape animation and the metric plots exist to show a predator
+    # driving the flock apart, so they force the predator on regardless of the
+    # shipped scenario, which is foraging and has no predator
+    escape = copy.deepcopy(cfg)
+    escape["scenario"]["predator"] = True
+    return build_world_from_config(escape)
+
+
 def build_world_from_config(cfg):
     world_size = cfg["world"]["size"]
     n_boids = cfg["world"]["n_boids"]
@@ -119,7 +130,10 @@ def build_world_from_config(cfg):
     food_amounts = None
     n_food = cfg["food"]["count"]
     if n_food > 0:
-        food_positions = rng.uniform(0, world_size, size=(n_food, 2))
+        food_positions = np.array([
+            food_mod.sample_clear(
+                lambda: rng.uniform(0, world_size, size=2), obstacles)
+            for _ in range(n_food)])
         food_amounts = np.full(n_food, float(cfg["food"]["amount"]))
 
     return World(positions, velocities, params, world_size,
@@ -192,11 +206,11 @@ def main():
 
     os.makedirs(OUT, exist_ok=True)
 
-    world = build_world_from_config(cfg)
+    world = build_escape_world(cfg)
     render.save_animation(world, frames=frames, dt=dt,
                           out_path=os.path.join(OUT, "flock_escape.gif"))
 
-    world = build_world_from_config(cfg)
+    world = build_escape_world(cfg)
     pol, nn, clusters = record_metrics(world, frames=frames, dt=dt)
     plot_series(pol, "polarization", "Flock polarization over time",
                 os.path.join(OUT, "polarization.png"))
