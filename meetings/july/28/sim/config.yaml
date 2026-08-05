@@ -83,9 +83,12 @@ preplanned:
 
 # Depleting food sources. Eating drains a source one unit per boid per step;
 # an exhausted source respawns at a seeded random location (near the flock
-# centroid when bounds is none, so food stays reachable as the flock drifts)
+# centroid when bounds is none, so food stays reachable as the flock drifts).
+# Set count to 0 to switch foraging off. For foraging on its own, with no
+# leaders, predator, or obstacles competing for attention, use
+# sim/foraging.yaml instead
 food:
-  count: 0
+  count: 3
   amount: 60
   eat_radius: 1.5
   respawn: true
