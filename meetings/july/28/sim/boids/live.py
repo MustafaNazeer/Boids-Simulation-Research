@@ -25,13 +25,19 @@ def main():
     def update(_):
         world.step(DT)
         _draw_frame(ax, world)
-        pol = metrics.polarization(world.velocities)
-        attached = metrics.follower_attachment(world.leader_ids,
-                                               world.leader_mask)
-        ax.set_title(
-            "leader follower live: polarization {:.2f}, attached {:.0%}".format(
-                pol, attached)
-        )
+        # the title reports whichever behaviors the config actually switched
+        # on, so a foraging run does not display a leader statistic that is
+        # always zero because the run has no leaders
+        parts = ["polarization {:.2f}".format(
+            metrics.polarization(world.velocities))]
+        if world.leader_mask is not None and world.leader_mask.any():
+            parts.append("following {:.0%}".format(
+                metrics.follower_attachment(world.leader_ids,
+                                            world.leader_mask)))
+        if world.food_positions is not None:
+            parts.append("foraging {:.0%}".format(
+                metrics.food_attachment(world.food_ids)))
+        ax.set_title("live: " + ", ".join(parts))
 
     anim = FuncAnimation(
         fig, update, interval=INTERVAL_MS, blit=False, cache_frame_data=False

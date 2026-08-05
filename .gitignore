@@ -29,6 +29,7 @@
 /meetings/*/*/sim/*
 !/meetings/*/*/sim/__init__.py
 !/meetings/*/*/sim/config.yaml
+!/meetings/*/*/sim/foraging.yaml
 !/meetings/*/*/sim/boids/
 
 # Inside boids/: ignore all, then permit only Python files.
