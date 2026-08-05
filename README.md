@@ -109,10 +109,42 @@ python3 -m sim.boids.run --config my-experiment.yaml
 A config that names an unknown key, an invalid bounds mode, or more leaders
 than boids is rejected at load time with a message naming the offending key.
 
+### July 28
+
+July 28 adds food foraging and a truly infinite world.
+
+A configurable number of depleting food sources sit in the world. A boid
+steers toward the nearest non empty source once it falls inside the sensing
+radius, drains that source by one unit per step while inside the much smaller
+eat radius, and an exhausted source respawns at full amount at a new seeded
+location. Separation, alignment, and cohesion all stay active alongside the
+food seek term. The recorder logs a `food_id` column after `leader_id`, the
+targeted source index or -1, recomputed from the logged positions each step so
+the stored graph matches the stored state.
+
+A third bounds mode, `none`, removes the world boundary entirely: positions
+and velocities pass through unchanged, and the renderer switches to a follow
+camera that pans a fixed size window centered on the flock without ever
+zooming. Food respawns near the flock centroid in this mode so foraging keeps
+working however far the flock travels.
+
+From `meetings/july/28`:
+
+```
+python3 -m sim.boids.live      # live animated window
+python3 -m sim.boids.run       # writes the animations, plots, snapshots, and trajectories
+python3 -m sim.boids.collect   # batch parameter sweep into deliverables/dataset/
+```
+
+In `sim/config.yaml`, `food.count` defaults to 0, so foraging is off unless
+asked for and no existing configuration changes how its flock moves. The
+recorder gains the `food_id` column on every run regardless, and the renderer
+restyle applies to every rendered output.
+
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
-window). The July 21 configuration file also needs PyYAML.
+window). The configuration file, introduced July 21, also needs PyYAML.
 
 ## Note
 
