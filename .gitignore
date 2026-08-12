@@ -18,10 +18,11 @@
 !/meetings/*/*/
 
 # Inside each meeting (meetings/<month>/<day>/): ignore all, then reopen
-# sim/ and presentation/.
+# sim/, presentation/, and ml/.
 /meetings/*/*/*
 !/meetings/*/*/sim/
 !/meetings/*/*/presentation/
+!/meetings/*/*/ml/
 
 # Inside sim/: ignore all, then permit the package marker, the configuration
 # file (added July 2026, the entry points read it at startup), and the boids
@@ -40,6 +41,19 @@
 # (no build_deck.py, no markdown draft, no run-live-demo notes).
 /meetings/*/*/presentation/*
 !/meetings/*/*/presentation/progress-deck.pptx
+
+# ml/ (added August 2026 for the GRU plus GNN edge classification work):
+# ignore all, then permit only Python sources, in the package root and in the
+# data/ and models/ subpackages. The test suite, requirements.txt, the results
+# write up, the virtualenv, and the generated run data all stay ignored.
+/meetings/*/*/ml/*
+!/meetings/*/*/ml/*.py
+!/meetings/*/*/ml/data/
+!/meetings/*/*/ml/models/
+/meetings/*/*/ml/data/*
+!/meetings/*/*/ml/data/*.py
+/meetings/*/*/ml/models/*
+!/meetings/*/*/ml/models/*.py
 
 # Never publish Python caches.
 __pycache__/

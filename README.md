@@ -150,10 +150,53 @@ obstacle; anything that ends a step inside one is now placed back on the
 surface and loses only the part of its velocity driving it deeper. Food is
 never placed inside an obstacle either.
 
+### August 11
+
+August 11 is the first machine learning work, and it lives in `ml/` rather
+than `sim/` because it consumes the recorded simulations instead of producing
+them.
+
+The task is the one the simulation was built to support: given the recorded
+trajectories alone, decide for every pair of agents whether they are connected
+under separation, under cohesion, and under alignment. A single GRU, its
+weights shared across every agent, encodes each agent's recent motion history
+into a vector. One round of message passing then runs over those vectors, and
+a symmetric head scores each pair with three independent outputs, because the
+three relations overlap rather than exclude one another.
+
+Edge labels are recomputed from the positions stored in each run's npz file
+together with the radii stored beside them, so training never reads the large
+trajectory CSVs. Node features are velocity, speed, and centroid relative
+position, which keeps them translation invariant and therefore valid in the
+unbounded `none` world. Splits hold out whole runs, never single frames.
+
+`baselines.py` is the part worth reading first. Because the ground truth edges
+are defined by a distance threshold, a model handed the pairwise distance can
+score very well while learning nothing about interaction. It therefore reports
+two references beside every result: ranking pairs by distance alone, and the
+best distance threshold chosen per run using that run's own test labels, which
+is an oracle and is labeled as one. `report.py` adds an ablation that withholds
+distance, and `seed_sweep.py` repeats the whole comparison across seeds so the
+numbers carry a spread.
+
+Layout:
+
+```
+ml/data/     labels, motion features, candidate pairs, the windowed dataset
+ml/models/   the shared GRU encoder, message passing, and the edge head
+ml/          metrics, baselines, splits, training, reporting, seed sweep
+```
+
+Needs PyTorch and PyTorch Geometric, which the simulation does not. Install
+them separately from the simulation's dependencies, CPU builds being
+sufficient.
+
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
-window). The configuration file, introduced July 21, also needs PyYAML.
+window). The configuration file, introduced July 21, also needs PyYAML. The
+August 11 machine learning code in `ml/` additionally needs PyTorch and
+PyTorch Geometric; nothing under `sim/` imports them.
 
 ## Note
 
