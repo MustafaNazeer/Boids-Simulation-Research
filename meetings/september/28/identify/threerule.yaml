@@ -1,0 +1,87 @@
+# Base configuration for the identifiability experiments.
+#
+# Only the three classic rules are on. Everything else that can contribute an
+# acceleration term is switched off, because the estimator in identify/ fits a
+# three term linear model and any unmodelled term shows up as residual it
+# cannot explain.
+#
+# min_speed is 0.0 on purpose. The minimum speed floor is a hard nonlinearity
+# that breaks the linear model on whatever agent frames it touches, and unlike
+# the maximum speed clamp it fires most often exactly where the interaction is
+# weakest. Setting it to zero removes it rather than masking around it.
+#
+# Used as `sweep run --config identify/threerule.yaml`. The sweep's own `plan`
+# subcommand is bypassed; identify/manifest.py writes the manifest instead,
+# because plan samples the extra behaviours randomly and this experiment needs
+# them all at zero.
+
+world:
+  size: 60.0
+  bounds: none          # overridden per run by the manifest, kept here for clarity
+  n_boids: 80
+  seed: 11
+
+motion:
+  max_speed: 8.0
+  min_speed: 0.0
+  dt: 0.2
+  frames: 50
+
+rules:
+
+  separation:
+    enabled: true
+    radius: 7.0
+    weight: 8.0
+
+  alignment:
+    enabled: true
+    radius: 16.0
+    weight: 1.6
+
+  cohesion:
+    enabled: true
+    radius: 16.0
+    weight: 0.5
+
+  obstacle_avoidance:
+    enabled: false
+    range: 4.0
+    weight: 2.5
+
+  predator_flee:
+    enabled: false
+    radius: 15.0
+    weight: 3.5
+
+  leader_follow:
+    enabled: false
+    radius: 20.0
+    weight: 1.0
+
+  leader_wander:
+    enabled: false
+    strength: 0.15
+    weight: 2.0
+
+  food_seek:
+    enabled: false
+    radius: 20.0
+    weight: 1.0
+
+leaders:
+  count: 0
+
+preplanned:
+  count: 0
+  speed: 8.0
+
+food:
+  count: 0
+  amount: 60
+  eat_radius: 1.5
+  respawn: true
+
+scenario:
+  predator: false
+  obstacles: false

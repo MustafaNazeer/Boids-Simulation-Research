@@ -14,6 +14,8 @@ deliverables do.
 meetings/<month>/<day>/sim/               the simulation source (boids rules, predator,
                                metrics, world, rendering, and runners)
 meetings/<month>/<day>/presentation/  the progress deck (progress-deck.pptx)
+meetings/<month>/<day>/ml/            the learning code (August 2026 onward)
+meetings/<month>/<day>/identify/      the inverse problem code (September 2026 onward)
 ```
 
 Generated artifacts (animations, metric plots, snapshots, and datasets) are
@@ -191,12 +193,63 @@ Needs PyTorch and PyTorch Geometric, which the simulation does not. Install
 them separately from the simulation's dependencies, CPU builds being
 sufficient.
 
+### September 28
+
+September 28 approaches the same system from the other direction, and the code
+lives in `identify/` rather than `ml/` because it fits the interaction rules
+directly instead of learning them. `sim/` and `ml/` are copied forward
+unchanged.
+
+The simulation records every generating parameter of every run, which makes it
+an exact verifier and not only a data source. The acceleration is linear in
+the three rule weights once the three radii are fixed, so the weights are
+profiled out in closed form by ordinary least squares at each candidate radius
+triple and only the radii are searched. The search is a deterministic coarse to
+fine coordinate descent, since a radius enters the model only through which
+pairs fall inside it and the residual is therefore piecewise smooth with kinks
+where a pair crosses.
+
+`tripwires.py` is the part worth reading first. It holds three checks that must
+pass before any number is emitted: that the reimplemented step reproduces the
+recorded trajectory, that with clean data at the true radii the residual sits
+at machine precision, and that the estimator handed a different system's
+trajectory reports that other system's parameters rather than the target's.
+Without them, a null result and a broken estimator are the same observation.
+
+`estimator.identified_interval` reports the set of radii the data cannot
+distinguish, because a radius is only ever identified up to the gap between
+neighbouring pair distances, and a point estimate would quote precision the
+data does not carry. `observe.py` holds the observation model: positions are
+observed with noise and velocities are differenced from them, since a tracker
+records positions and not velocities, and its docstring writes out the index
+arithmetic that relates the two.
+
+`manifest.py` writes controlled sweeps without touching the simulator, by
+emitting a manifest that `sim.boids.sweep run` executes. Every field that
+subcommand consumes is a manifest column, including the frame count, the
+timestep, the world size and the bounds mode, so an experiment that varies any
+of them needs no simulation changes.
+
+Layout:
+
+```
+identify/basis.py       the three rules as design matrix columns
+identify/observe.py     noisy positions in, regression windows out
+identify/estimator.py   profile least squares over the radii
+identify/tripwires.py   the checks that gate every result
+identify/manifest.py    controlled sweeps, written without touching sim/
+identify/experiment.py  the sampling rate experiment and its aggregation
+```
+
+Needs numpy, scipy and PyYAML, and never PyTorch, so it runs on the same plain
+Python installation the simulation does.
+
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
 window). The configuration file, introduced July 21, also needs PyYAML. The
 August 11 machine learning code in `ml/` additionally needs PyTorch and
-PyTorch Geometric; nothing under `sim/` imports them.
+PyTorch Geometric; nothing under `sim/` or `identify/` imports them.
 
 ## Note
 

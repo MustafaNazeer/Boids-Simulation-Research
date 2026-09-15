@@ -1,0 +1,87 @@
+# Food foraging scenario.
+#
+#   python3 -m sim.boids.live --config sim/foraging.yaml
+#   python3 -m sim.boids.run  --config sim/foraging.yaml
+#
+# The shipped sim/config.yaml has food.count at 0 and three wander leaders, so
+# it shows leader follower behavior. This file is the foraging counterpart: it
+# switches food on and clears the predator, the obstacles, and the leaders so
+# the converge, deplete, and re target cycle is the only thing on screen.
+#
+# Set world.bounds to none below to watch the same behavior on an unbounded
+# plane, with the camera following the flock.
+
+world:
+  size: 60.0
+  bounds: reflect       # reflect, wrap, or none (unbounded plane)
+  n_boids: 120
+  seed: 11
+
+motion:
+  max_speed: 5.0
+  min_speed: 1.5
+  dt: 0.2
+  frames: 300
+
+rules:
+
+  separation:
+    enabled: true
+    radius: 7.0
+    weight: 8.0
+
+  alignment:
+    enabled: true
+    radius: 16.0
+    weight: 1.6
+
+  cohesion:
+    enabled: true
+    radius: 16.0
+    weight: 0.5
+
+  obstacle_avoidance:
+    enabled: true
+    range: 4.0
+    weight: 2.5
+
+  predator_flee:
+    enabled: true
+    radius: 15.0
+    weight: 3.5
+
+  leader_follow:
+    enabled: true
+    radius: 20.0
+    weight: 1.0
+
+  leader_wander:
+    enabled: true
+    strength: 0.15
+    weight: 2.0
+
+  food_seek:
+    enabled: true
+    radius: 20.0
+    weight: 1.0
+
+# No leaders in this scenario, so nothing competes with the food for attention
+leaders:
+  count: 0
+
+preplanned:
+  count: 0
+  speed: 5.0
+
+# Three depleting sources. Raise count for a busier world, or set respawn to
+# false to watch the flock strip the world bare and then go back to plain
+# flocking
+food:
+  count: 3
+  amount: 60
+  eat_radius: 1.5
+  respawn: true
+
+scenario:
+  predator: false
+  obstacles: false

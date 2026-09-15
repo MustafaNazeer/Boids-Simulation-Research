@@ -23,6 +23,7 @@
 !/meetings/*/*/sim/
 !/meetings/*/*/presentation/
 !/meetings/*/*/ml/
+!/meetings/*/*/identify/
 
 # Inside sim/: ignore all, then permit the package marker, the configuration
 # file (added July 2026, the entry points read it at startup), and the boids
@@ -54,6 +55,15 @@
 !/meetings/*/*/ml/data/*.py
 /meetings/*/*/ml/models/*
 !/meetings/*/*/ml/models/*.py
+
+# identify/ (added September 2026 for the rule identifiability work): ignore
+# all, then permit only Python sources in the package root, plus the base
+# configuration the controlled sweeps are generated against. The test suite,
+# the shell drivers, the results write up, and the generated run data all stay
+# ignored, exactly as they do under ml/.
+/meetings/*/*/identify/*
+!/meetings/*/*/identify/*.py
+!/meetings/*/*/identify/threerule.yaml
 
 # Never publish Python caches.
 __pycache__/
