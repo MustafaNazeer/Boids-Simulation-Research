@@ -239,7 +239,19 @@ identify/estimator.py   profile least squares over the radii
 identify/tripwires.py   the checks that gate every result
 identify/manifest.py    controlled sweeps, written without touching sim/
 identify/experiment.py  the sampling rate experiment and its aggregation
+identify/eiv.py         attributes the weight bias to the noise that causes it
+identify/weak.py        the integral formulation, which never differentiates
 ```
+
+`weak.py` is the one to read after `tripwires.py`. Differencing positions to
+get velocities amplifies noise, so the integral formulation multiplies the
+exact discrete relation by a test function that vanishes with its first
+difference at both ends of a window and sums by parts, moving both
+differences onto the test function. The target is then a smooth weighted sum
+of positions rather than a difference of them. `eiv.py` is what motivated it:
+it measures the bias three ways, with noise in the design matrix alone, with
+noise in the target alone, and with both, so the part that comes from the two
+being correlated can be separated from the part that does not.
 
 Needs numpy, scipy and PyYAML, and never PyTorch, so it runs on the same plain
 Python installation the simulation does.
