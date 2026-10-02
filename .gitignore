@@ -65,6 +65,13 @@
 !/meetings/*/*/identify/*.py
 !/meetings/*/*/identify/threerule.yaml
 
+# discover/ (added October 2026, LLM proposed rule discovery): a top level
+# package, not a meeting. Python sources only; tests, run logs, results, docs
+# and data stay private, as they do under ml/ and identify/.
+!/discover/
+/discover/*
+!/discover/*.py
+
 # Never publish Python caches.
 __pycache__/
 *.pyc

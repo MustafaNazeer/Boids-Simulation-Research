@@ -16,6 +16,7 @@ meetings/<month>/<day>/sim/               the simulation source (boids rules, pr
 meetings/<month>/<day>/presentation/  the progress deck (progress-deck.pptx)
 meetings/<month>/<day>/ml/            the learning code (August 2026 onward)
 meetings/<month>/<day>/identify/      the inverse problem code (September 2026 onward)
+discover/                             LLM proposed rule discovery (October 2026)
 ```
 
 Generated artifacts (animations, metric plots, snapshots, and datasets) are
@@ -256,12 +257,44 @@ being correlated can be separated from the part that does not.
 Needs numpy, scipy and PyYAML, and never PyTorch, so it runs on the same plain
 Python installation the simulation does.
 
+## discover/ (October 2026)
+
+`discover/` asks whether a large language model can propose the interaction
+rule behind a group's motion. Claude (Sonnet 5.5, with Haiku 4.5 and Opus 5.5
+in a comparison run) is shown only that agents move in three dimensions, plus
+neutral facts about the data's scale, and writes candidate rules as short
+Python feature functions. The prompt never says what the agents are.
+
+Each candidate runs in a separate, resource limited process with an import
+allowlist (`sandbox.py`, `child.py`). Its weights are fitted by least squares
+on the integral (weak) form of the motion in 3D (`weak3d.py`), its distance
+parameters by a coarse to fine search on fit windows only, and it is scored on
+held apart validation windows with a small penalty per term and parameter
+(`verify.py`). An island search sends one batch of proposals per generation
+(`search.py`, `llm.py`), and every batch passes through a spend ledger with a
+hard cap before it is sent (`ledger.py`). A WSINDy style sparse regression with
+the same radius search is the baseline (`baseline.py`).
+
+The pipeline was gated on two simulated systems with known rules (`truth.py`),
+where the true features recover the true weights to about 1e-15, and then run
+on the laboratory midge swarm trajectories of Sinhuber et al., Scientific Data
+2019 (`midges.py`), with four swarms held out for a single final test. In that
+pilot the model's best rule and the baseline tied on the held out swarms, and
+on simulated boids no model recovered the true rule, which a fixed library
+does easily. Both outcomes are reported as found.
+
+Run from the repository root, for example
+`python -m discover.cli prepare-sim --system well` and
+`python -m discover.cli baseline --task sim-well`. Searching needs the
+`anthropic` package and an API key.
+
 ## Dependencies
 
 Python 3, numpy, scipy, matplotlib, and Pillow (with ImageTk for the live
 window). The configuration file, introduced July 21, also needs PyYAML. The
 August 11 machine learning code in `ml/` additionally needs PyTorch and
 PyTorch Geometric; nothing under `sim/` or `identify/` imports them.
+`discover/` needs numpy, plus the `anthropic` package for searching.
 
 ## Note
 
